@@ -71,6 +71,8 @@ public class MNScanConfig implements Serializable {
     private String statusBarColor = "#00000000";
     //状态栏是否显示黑色字体
     private boolean statusBarDarkMode = false;
+    //是否绘制扫描框
+    private boolean drawScanBox = true;
 
     private MNScanConfig() {
 
@@ -102,7 +104,7 @@ public class MNScanConfig implements Serializable {
         resultPointColor = builder.resultPointColor;
         statusBarColor = builder.statusBarColor;
         statusBarDarkMode = builder.statusBarDarkMode;
-
+        drawScanBox = builder.drawScanBox;
     }
 
     public String getStatusBarColor() {
@@ -201,6 +203,10 @@ public class MNScanConfig implements Serializable {
         return isSupportZoom;
     }
 
+    public boolean drawScanBox() {
+        return drawScanBox;
+    }
+
     public static class Builder {
         private boolean showPhotoAlbum = true;
         private boolean showBeep = true;
@@ -242,8 +248,10 @@ public class MNScanConfig implements Serializable {
         private String statusBarColor = "#00000000";
         //状态栏是否显示黑色字体
         private boolean statusBarDarkMode = false;
+        //是否绘制扫描框
+        private boolean drawScanBox = true;
 
-        public MNScanConfig builder() {
+        public MNScanConfig build() {
             return new MNScanConfig(this);
         }
 
@@ -307,11 +315,13 @@ public class MNScanConfig implements Serializable {
             return this;
         }
 
+        @Deprecated
         public Builder setActivityOpenAnime(int activityOpenAnime) {
             this.activityOpenAnime = activityOpenAnime;
             return this;
         }
 
+        @Deprecated
         public Builder setActivityExitAnime(int activityExitAnime) {
             this.activityExitAnime = activityExitAnime;
             return this;
@@ -363,6 +373,10 @@ public class MNScanConfig implements Serializable {
             return this;
         }
 
+        public Builder setDrawScanBox(boolean drawScanBox) {
+            this.drawScanBox = drawScanBox;
+            return this;
+        }
     }
 
 }

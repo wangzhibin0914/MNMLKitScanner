@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/drawable/button_flash_light_selector.xml" value="0.1" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/drawable/button_input_number_selector.xml" value="0.143" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/layout/activity_custom_config.xml" value="0.27898550724637683" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/layout/activity_main.xml" value="0.27898550724637683" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/layout/activity_wechat_code_scan.xml" value="0.17844202898550723" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/layout/custom_scan_action_menu.xml" value="0.1" />
+        <entry key="..\:/git/Private/MNMLKitScanner/app/src/main/res/layout/layout_custom_view.xml" value="0.14402173913043478" />
+        <entry key="..\:/git/Private/MNMLKitScanner/mlkit-scanner/src/main/res/layout/mn_scan_action_menu.xml" value="0.15806159420289856" />
+        <entry key="..\:/git/Private/MNMLKitScanner/mlkit-scanner/src/main/res/layout/mn_scan_activity_scan_preview.xml" value="0.15806159420289856" />
+      </map>
+    </option>
+  </component>
   <component name="MarkdownProjectSettings" wasCopied="true">
     <PreviewSettings splitEditorLayout="SPLIT" splitEditorPreview="PREVIEW" useGrayscaleRendering="false" zoomFactor="1.0" maxImageWidth="0" showGitHubPageIfSynced="false" allowBrowsingInPreview="false" synchronizePreviewPosition="true" highlightPreviewType="NONE" highlightFadeOut="5" highlightOnTyping="true" synchronizeSourcePosition="true" verticallyAlignSourceAndPreviewSyncPosition="true" showSearchHighlightsInPreview="false" showSelectionInPreview="true" openRemoteLinks="true" replaceUnicodeEmoji="false" lastLayoutSetsDefault="false">
       <PanelProvider>

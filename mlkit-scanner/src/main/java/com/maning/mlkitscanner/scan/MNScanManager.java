@@ -35,14 +35,14 @@ public class MNScanManager {
 
     public static void startScan(Activity activity, MNScanConfig mnScanConfig, MNScanCallback scanCallback) {
         if (mnScanConfig == null) {
-            mnScanConfig = new MNScanConfig.Builder().builder();
+            mnScanConfig = new MNScanConfig.Builder().build();
         }
         Intent intent = new Intent(activity.getApplicationContext(), ScanPreviewActivity.class);
         //传递数据
         intent.putExtra(MNScanManager.INTENT_KEY_CONFIG_MODEL, mnScanConfig);
         ActResultRequest actResultRequest = new ActResultRequest(activity);
         actResultRequest.startForResult(intent, scanCallback);
-        activity.overridePendingTransition(mnScanConfig.getActivityOpenAnime(), android.R.anim.fade_out);
+//        activity.overridePendingTransition(mnScanConfig.getActivityOpenAnime(), android.R.anim.fade_out);
     }
 
     /**

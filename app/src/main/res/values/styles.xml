@@ -7,4 +7,7 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <declare-styleable name="ScanBoxView">
+        <attr name="type" format="integer" />
+    </declare-styleable>
 </resources>

@@ -28,7 +28,6 @@ import com.maning.mlkitscanner.scan.MNScanManager;
 import com.maning.mlkitscanner.scan.callback.OnCameraAnalyserCallback;
 import com.maning.mlkitscanner.scan.camera.CameraManager;
 import com.maning.mlkitscanner.scan.model.MNScanConfig;
-import com.maning.mlkitscanner.scan.utils.BeepManager;
 import com.maning.mlkitscanner.scan.utils.ImageUtils;
 import com.maning.mlkitscanner.scan.utils.StatusBarUtil;
 import com.maning.mlkitscanner.scan.view.ScanActionMenuView;
@@ -132,7 +131,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
     private void initConfig() {
         mScanConfig = (MNScanConfig) getIntent().getSerializableExtra(MNScanManager.INTENT_KEY_CONFIG_MODEL);
         if (mScanConfig == null) {
-            mScanConfig = new MNScanConfig.Builder().builder();
+            mScanConfig = new MNScanConfig.Builder().build();
         }
     }
 
@@ -148,7 +147,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         action_menu_view.setOnScanActionMenuListener(new ScanActionMenuView.OnScanActionMenuListener() {
             @Override
             public void onClose() {
-                finishCancle();
+                finishCancel();
             }
 
             @Override
@@ -180,7 +179,13 @@ public class ScanPreviewActivity extends AppCompatActivity {
             }
         });
 
-        viewfinderView.setScanConfig(mScanConfig);
+        if (mScanConfig.drawScanBox()){
+            viewfinderView.setScanConfig(mScanConfig);
+        }else {
+            viewfinderView.setVisibility(View.GONE);
+            viewfinderView.destroyView();
+            rl_act_root.removeView(viewfinderView);
+        }
         result_point_view.setScanConfig(mScanConfig);
         action_menu_view.setScanConfig(mScanConfig, MNScanConfig.mCustomViewBindCallback);
     }
@@ -318,7 +323,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
             return;
         }
         //取消扫码
-        finishCancle();
+        finishCancel();
     }
 
     @Override
@@ -327,7 +332,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void finishCancle() {
+    private void finishCancel() {
         setResult(MNScanManager.RESULT_CANCLE, new Intent());
         finishFinal();
     }
@@ -372,7 +377,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
      */
     public static void closeScanPage() {
         if (sActivityRef != null && sActivityRef.get() != null) {
-            sActivityRef.get().finishCancle();
+            sActivityRef.get().finishCancel();
         }
     }
 

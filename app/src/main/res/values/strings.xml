@@ -1,3 +1,8 @@
-<resources>
-    <string name="app_name">MLKit扫码</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" translatable="false">MLKit扫码</string>
+    <string name="start_scan_bindcharge_tips" translatable="false">请扫描充电桩上的二维码</string>
+    <string name="scan_code_text" translatable="false">扫码</string>
+    <string name="input_manual" tools:ignore="ExtraTranslation" translatable="false">手动输入</string>
+    <string name="flash_light_open" translatable="false">打开手电筒</string>
+    <string name="flash_light_close" translatable="false">关闭手电筒</string>
 </resources>

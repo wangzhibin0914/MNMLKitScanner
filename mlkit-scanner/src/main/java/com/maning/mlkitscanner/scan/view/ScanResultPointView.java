@@ -161,7 +161,7 @@ public class ScanResultPointView extends FrameLayout {
             return;
         }
         if (scanConfig == null) {
-            scanConfig = new MNScanConfig.Builder().builder();
+            scanConfig = new MNScanConfig.Builder().build();
         }
         if (resultPoint.size() == 1) {
             tv_cancle.setVisibility(View.INVISIBLE);

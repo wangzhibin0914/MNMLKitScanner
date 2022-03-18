@@ -222,107 +222,109 @@ public class CustomConfigActivity extends AppCompatActivity implements View.OnCl
 
     public void scanCode(View view) {
         //需要判断有没有权限
-        MNScanConfig scanConfig = new MNScanConfig.Builder()
-                //设置完成震动
-                .isShowVibrate(mCbVibrate.isChecked())
-                //扫描完成声音
-                .isShowBeep(mCbBeep.isChecked())
-                //显示相册功能
-                .isShowPhotoAlbum(mCbPhoto.isChecked())
-                //显示闪光灯
-                .isShowLightController(mCbLight.isChecked())
-                //打开扫描页面的动画
-                .setActivityOpenAnime(R.anim.activity_anmie_in)
-                //退出扫描页面动画
-                .setActivityExitAnime(R.anim.activity_anmie_out)
-                //自定义文案
-                .setScanHintText(mEtHintText.getText().toString())
-                .setScanHintTextColor(colorText)
-                .setScanHintTextSize(TextUtils.isEmpty(mEtHintTextSize.getText().toString()) ? 14 : Integer.parseInt(mEtHintTextSize.getText().toString()))
-                //扫描线的颜色
-                .setScanColor(colorLine)
-                //是否支持手势缩放
-                .setSupportZoom(mCbSupportZoom.isChecked())
-                //扫描线样式
-                .setLaserStyle(mRbScanlineGrid.isChecked() ? MNScanConfig.LaserStyle.Grid : MNScanConfig.LaserStyle.Line)
-                //背景颜色
-                .setBgColor(colorBackground)
-                //网格扫描线的列数
-                .setGridScanLineColumn(TextUtils.isEmpty(mEtGridlineNum.getText().toString()) ? 30 : Integer.parseInt(mEtGridlineNum.getText().toString()))
-                //网格高度
-                .setGridScanLineHeight(TextUtils.isEmpty(mEtGridlineHeight.getText().toString()) ? 0 : Integer.parseInt(mEtGridlineHeight.getText().toString()))
-                //是否全屏扫描,默认全屏
-                .setFullScreenScan(mCbFullscreenScan.isChecked())
-                //单位dp
-                .setResultPointConfigs(36, 12, 3, colorResultPointStroke, colorResultPoint)
-                //状态栏设置
-                .setStatusBarConfigs(colorStatusBar, mCbStatusDark.isChecked())
-                //自定义遮罩
-                .setCustomShadeViewLayoutID(mCbCustomView.isChecked() ? R.layout.layout_custom_view : 0, new MNCustomViewBindCallback() {
-                    @Override
-                    public void onBindView(View customView) {
-                        if (customView == null) {
-                            return;
-                        }
-                        ImageView iv_back = customView.findViewById(R.id.iv_back);
-                        ImageView iv_photo = customView.findViewById(R.id.iv_photo);
-                        LinearLayout btn_scan_light = customView.findViewById(R.id.btn_scan_light);
-                        final ImageView iv_scan_light = customView.findViewById(R.id.iv_scan_light);
-                        final TextView tv_scan_light = customView.findViewById(R.id.tv_scan_light);
-                        LinearLayout btn_my_card = customView.findViewById(R.id.btn_my_card);
-                        LinearLayout btn_scan_record = customView.findViewById(R.id.btn_scan_record);
-                        iv_back.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //关闭扫描页面
-                                MNScanManager.closeScanPage();
-                            }
-                        });
-                        btn_scan_light.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //手电筒
-                                if (MNScanManager.isLightOn()) {
-                                    MNScanManager.closeScanLight();
-                                    iv_scan_light.setImageResource(R.drawable.icon_custom_light_close);
-                                    tv_scan_light.setText("开启手电筒");
-                                } else {
-                                    MNScanManager.openScanLight();
-                                    iv_scan_light.setImageResource(R.drawable.icon_custom_light_open);
-                                    tv_scan_light.setText("关闭手电筒");
-                                }
-                            }
-                        });
-                        iv_photo.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //打开相册扫描
-                                MNScanManager.openAlbumPage();
-                            }
-                        });
-                        btn_my_card.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //我的名片
-                                showToast("我的名片");
-                            }
-                        });
-                        btn_scan_record.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                //扫码记录
-                                showToast("扫码记录");
-                            }
-                        });
-                    }
-                })
-                .builder();
-        MNScanManager.startScan(this, scanConfig, new MNScanCallback() {
-            @Override
-            public void onActivityResult(int resultCode, Intent data) {
-                handlerResult(resultCode, data);
-            }
-        });
+//        MNScanConfig scanConfig = new MNScanConfig.Builder()
+//                //设置完成震动
+//                .isShowVibrate(mCbVibrate.isChecked())
+//                //扫描完成声音
+//                .isShowBeep(mCbBeep.isChecked())
+//                //显示相册功能
+//                .isShowPhotoAlbum(mCbPhoto.isChecked())
+//                //显示闪光灯
+//                .isShowLightController(mCbLight.isChecked())
+//                //打开扫描页面的动画
+//                .setActivityOpenAnime(R.anim.activity_anmie_in)
+//                //退出扫描页面动画
+//                .setActivityExitAnime(R.anim.activity_anmie_out)
+//                //自定义文案
+//                .setScanHintText(mEtHintText.getText().toString())
+//                .setScanHintTextColor(colorText)
+//                .setScanHintTextSize(TextUtils.isEmpty(mEtHintTextSize.getText().toString()) ? 14 : Integer.parseInt(mEtHintTextSize.getText().toString()))
+//                //扫描线的颜色
+//                .setScanColor(colorLine)
+//                //是否支持手势缩放
+//                .setSupportZoom(mCbSupportZoom.isChecked())
+//                //扫描线样式
+//                .setLaserStyle(mRbScanlineGrid.isChecked() ? MNScanConfig.LaserStyle.Grid : MNScanConfig.LaserStyle.Line)
+//                //背景颜色
+//                .setBgColor(colorBackground)
+//                //网格扫描线的列数
+//                .setGridScanLineColumn(TextUtils.isEmpty(mEtGridlineNum.getText().toString()) ? 30 : Integer.parseInt(mEtGridlineNum.getText().toString()))
+//                //网格高度
+//                .setGridScanLineHeight(TextUtils.isEmpty(mEtGridlineHeight.getText().toString()) ? 0 : Integer.parseInt(mEtGridlineHeight.getText().toString()))
+//                //是否全屏扫描,默认全屏
+//                .setFullScreenScan(mCbFullscreenScan.isChecked())
+//                //单位dp
+//                .setResultPointConfigs(36, 12, 3, colorResultPointStroke, colorResultPoint)
+//                //状态栏设置
+//                .setStatusBarConfigs(colorStatusBar, mCbStatusDark.isChecked())
+//                //自定义遮罩
+//                .setCustomShadeViewLayoutID(mCbCustomView.isChecked() ? R.layout.layout_custom_view : 0, new MNCustomViewBindCallback() {
+//                    @Override
+//                    public void onBindView(View customView) {
+//                        if (customView == null) {
+//                            return;
+//                        }
+//                        ImageView iv_back = customView.findViewById(R.id.iv_back);
+//                        ImageView iv_photo = customView.findViewById(R.id.iv_photo);
+//                        LinearLayout btn_scan_light = customView.findViewById(R.id.btn_scan_light);
+//                        final ImageView iv_scan_light = customView.findViewById(R.id.iv_scan_light);
+//                        final TextView tv_scan_light = customView.findViewById(R.id.tv_scan_light);
+//                        LinearLayout btn_my_card = customView.findViewById(R.id.btn_my_card);
+//                        LinearLayout btn_scan_record = customView.findViewById(R.id.btn_scan_record);
+//                        iv_back.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                //关闭扫描页面
+//                                MNScanManager.closeScanPage();
+//                            }
+//                        });
+//                        btn_scan_light.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                //手电筒
+//                                if (MNScanManager.isLightOn()) {
+//                                    MNScanManager.closeScanLight();
+//                                    iv_scan_light.setImageResource(R.drawable.icon_custom_light_close);
+//                                    tv_scan_light.setText("开启手电筒");
+//                                } else {
+//                                    MNScanManager.openScanLight();
+//                                    iv_scan_light.setImageResource(R.drawable.icon_custom_light_open);
+//                                    tv_scan_light.setText("关闭手电筒");
+//                                }
+//                            }
+//                        });
+//                        iv_photo.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                //打开相册扫描
+//                                MNScanManager.openAlbumPage();
+//                            }
+//                        });
+//                        btn_my_card.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                //我的名片
+//                                showToast("我的名片");
+//                            }
+//                        });
+//                        btn_scan_record.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                //扫码记录
+//                                showToast("扫码记录");
+//                            }
+//                        });
+//                    }
+//                })
+//                .build();
+//        MNScanManager.startScan(this, scanConfig, new MNScanCallback() {
+//            @Override
+//            public void onActivityResult(int resultCode, Intent data) {
+//                handlerResult(resultCode, data);
+//            }
+//        });
+
+        MultiScanUtils.Companion.startSuperScan(this,false,false);
     }
 
     private void showToast(String msg) {

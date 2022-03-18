@@ -46,7 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
         }else if (view.getId() == R.id.btn_scan_custom) {
             //跳转到自定义界面
-            startActivity(new Intent(this, CustomConfigActivity.class));
+//            startActivity(new Intent(this, CustomConfigActivity.class));
+            MultiScanUtils.Companion.startSuperScan(this,false,false);
         }
     }
 
