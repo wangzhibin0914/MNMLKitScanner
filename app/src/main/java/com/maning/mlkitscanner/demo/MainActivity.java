@@ -7,6 +7,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.maning.mlkitscanner.scan.MNScanManager;
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button btnScanDefault;
     private Button btnScanCustom;
+    private Button btnScanCustom2;
     private TextView tvResults;
 
     @Override
@@ -30,8 +32,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initView() {
         btnScanDefault = (Button) findViewById(R.id.btn_scan_default);
         btnScanCustom = (Button) findViewById(R.id.btn_scan_custom);
+        btnScanCustom2 = (Button) findViewById(R.id.btn_scan_custom2);
         btnScanDefault.setOnClickListener(this);
         btnScanCustom.setOnClickListener(this);
+        btnScanCustom2.setOnClickListener(this);
         tvResults = (TextView) findViewById(R.id.tv_results);
     }
 
@@ -46,8 +50,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             });
         }else if (view.getId() == R.id.btn_scan_custom) {
             //跳转到自定义界面
-//            startActivity(new Intent(this, CustomConfigActivity.class));
-            MultiScanUtils.Companion.startSuperScan(this,false,false);
+            startActivity(new Intent(this, CustomConfigActivity.class));
+        }else if (view.getId() == R.id.btn_scan_custom2) {
+            //跳转到自定义界面
+            MultiScanUtils.Companion.startSuperScan(this, false, false, new MultiScanUtils.OnScanCallback() {
+                @Override
+                public void onResult(@Nullable String resultStr) {
+                    showToast(resultStr);
+                }
+            });
         }
     }
 
@@ -81,4 +92,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
 }

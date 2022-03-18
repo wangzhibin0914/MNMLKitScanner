@@ -15,23 +15,31 @@ import com.maning.mlkitscanner.scan.callback.act.MNScanCallback
 import com.maning.mlkitscanner.scan.model.MNScanConfig
 
 class MultiScanUtils {
+    interface OnScanCallback {
+        fun onResult(resultStr: String?)
+    }
 
     companion object {
         const val TAG = "MultiScanUtils"
         private const val colorText = "#22CE6B"
         private const val colorLine = "#22CE6B"
         private const val colorBackground = "#22FF0000"
-        private const val colorStatusBar = "#00000000"
+        private const val colorStatusBar = "#33000000"
         private const val colorResultPoint = "#CC22CE6B"
         private const val colorResultPointStroke = "#FFFFFFFF"
 
-        fun startSuperScan(activity: Activity, grid: Boolean, fullScreen: Boolean) {
+        fun startSuperScan(
+            activity: Activity,
+            grid: Boolean,
+            fullScreen: Boolean,
+            callback: OnScanCallback
+        ) {
             //需要判断有没有权限
             val scanConfig = MNScanConfig.Builder()
                 //设置完成震动
                 .isShowVibrate(true)
                 //扫描完成声音
-                .isShowBeep(true)
+                .isShowBeep(false)
                 //显示相册功能
                 .isShowPhotoAlbum(false)
                 //显示闪光灯
@@ -60,7 +68,7 @@ class MultiScanUtils {
                 //单位dp
                 .setResultPointConfigs(36, 12, 3, colorResultPointStroke, colorResultPoint)
                 //状态栏设置
-//            .setStatusBarConfigs(colorStatusBar, mCbStatusDark.isChecked())
+                .setStatusBarConfigs(colorStatusBar, false)
                 //绘制扫描框
                 .setDrawScanBox(false)
                 //自定义遮罩
@@ -104,7 +112,7 @@ class MultiScanUtils {
                     })
                 .build()
             MNScanManager.startScan(activity, scanConfig,
-                MNScanCallback { resultCode, data -> handlerResult(resultCode, data) })
+                MNScanCallback { resultCode, data -> handlerResult(resultCode, data, callback) })
         }
 
 
@@ -115,14 +123,15 @@ class MultiScanUtils {
             MNScanManager.startScan(
                 activity
             ) { resultCode, data ->
-                handlerResult(resultCode, data);
+                handlerResult(resultCode, data, null)
             }
         }
 
-        private fun handlerResult(resultCode: Int, data: Intent?) {
+        private fun handlerResult(resultCode: Int, data: Intent?, callback: OnScanCallback?) {
             if (data == null) {
                 return
             }
+            var resultStr2: String
             when (resultCode) {
                 MNScanManager.RESULT_SUCCESS -> {
                     val results =
@@ -135,15 +144,22 @@ class MultiScanUtils {
                         resultStr.append("\n")
                         i++
                     }
+                    resultStr2 = resultStr.toString()
                 }
                 MNScanManager.RESULT_FAIL -> {
                     val resultError = data.getStringExtra(MNScanManager.INTENT_KEY_RESULT_ERROR)
+                    resultStr2 = resultError
                 }
                 MNScanManager.RESULT_CANCLE -> {
                     Log.d(TAG, "取消扫码")
+                    resultStr2 = "canceled"
                 }
-                else -> {}
+                else -> {
+                    resultStr2 = "No result"
+                }
             }
+
+            callback?.onResult(resultStr2)
         }
 
     }

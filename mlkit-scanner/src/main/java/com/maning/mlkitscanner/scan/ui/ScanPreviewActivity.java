@@ -115,10 +115,11 @@ public class ScanPreviewActivity extends AppCompatActivity {
         cameraManager.setOnCameraAnalyserCallback(new OnCameraAnalyserCallback() {
             @Override
             public void onSuccess(Bitmap bitmap, List<Barcode> barcodes) {
-                result_point_view.setDatas(barcodes, bitmap);
-                result_point_view.setVisibility(View.VISIBLE);
                 if (barcodes.size() == 1) {
                     finishSuccess(barcodes.get(0).getRawValue());
+                } else {
+                    result_point_view.setDatas(barcodes, bitmap);
+                    result_point_view.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -179,9 +180,9 @@ public class ScanPreviewActivity extends AppCompatActivity {
             }
         });
 
-        if (mScanConfig.drawScanBox()){
+        if (mScanConfig.drawScanBox()) {
             viewfinderView.setScanConfig(mScanConfig);
-        }else {
+        } else {
             viewfinderView.setVisibility(View.GONE);
             viewfinderView.destroyView();
             rl_act_root.removeView(viewfinderView);
@@ -367,7 +368,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         rl_act_root.removeView(mPreviewView);
         rl_act_root.removeView(action_menu_view);
         finish();
-        overridePendingTransition(0, mScanConfig.getActivityExitAnime() == 0 ? R.anim.mn_scan_activity_bottom_out : mScanConfig.getActivityExitAnime());
+//        overridePendingTransition(0, mScanConfig.getActivityExitAnime() == 0 ? R.anim.mn_scan_activity_bottom_out : mScanConfig.getActivityExitAnime());
     }
 
     //---------对外提供方法----------
