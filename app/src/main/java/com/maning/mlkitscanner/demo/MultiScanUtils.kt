@@ -39,7 +39,7 @@ class MultiScanUtils {
                 //设置完成震动
                 .isShowVibrate(true)
                 //扫描完成声音
-                .isShowBeep(false)
+                .isShowBeep(true)
                 //显示相册功能
                 .isShowPhotoAlbum(false)
                 //显示闪光灯

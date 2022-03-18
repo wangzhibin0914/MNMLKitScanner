@@ -34,37 +34,46 @@ public final class BeepManager implements MediaPlayer.OnErrorListener, Closeable
     private static final long VIBRATE_DURATION = 200L;
 
     private final Context context;
-    private MediaPlayer mediaPlayer;
+    //    private MediaPlayer mediaPlayer;
+    private SoundPoolUtil mSoundPoolUtil;
     private Vibrator vibrator;
     private boolean playBeep;
     private boolean vibrate;
 
     public BeepManager(Context context) {
         this.context = context;
-        this.mediaPlayer = null;
+//        this.mediaPlayer = null;
+        this.mSoundPoolUtil = null;
         updatePrefs();
     }
 
-    public void setVibrate(boolean vibrate){
+    public void setVibrate(boolean vibrate) {
         this.vibrate = vibrate;
     }
 
-    public void setPlayBeep(boolean playBeep){
+    public void setPlayBeep(boolean playBeep) {
         this.playBeep = playBeep;
     }
 
     private synchronized void updatePrefs() {
-        if (mediaPlayer == null) {
-            mediaPlayer = buildMediaPlayer(context);
+//        if (mediaPlayer == null) {
+//            mediaPlayer = buildMediaPlayer(context);
+//        }
+        if (mSoundPoolUtil == null) {
+            mSoundPoolUtil = new SoundPoolUtil();
+            mSoundPoolUtil.loadDefault(context);
         }
-        if(vibrator == null){
+        if (vibrator == null) {
             vibrator = (Vibrator)context.getSystemService(Context.VIBRATOR_SERVICE);
         }
     }
 
     public synchronized void playBeepSoundAndVibrate() {
-        if (playBeep && mediaPlayer != null) {
-            mediaPlayer.start();
+//        if (playBeep && mediaPlayer != null) {
+//            mediaPlayer.start();
+//        }
+        if (playBeep && mSoundPoolUtil != null) {
+            mSoundPoolUtil.play();
         }
         if (vibrate) {
             vibrator.vibrate(VIBRATE_DURATION);
@@ -96,13 +105,14 @@ public final class BeepManager implements MediaPlayer.OnErrorListener, Closeable
 
     @Override
     public synchronized void close() {
-        try{
-            if (mediaPlayer != null) {
-                mediaPlayer.release();
-                mediaPlayer = null;
-            }
-        }catch (Exception e){
-        }
+//        try {
+//            if (mediaPlayer != null) {
+//                mediaPlayer.release();
+//                mediaPlayer = null;
+//            }
+//        } catch (Exception e) {
+//        }
+        if (mSoundPoolUtil != null) mSoundPoolUtil.release();
     }
 
 }
