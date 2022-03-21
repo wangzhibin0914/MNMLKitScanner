@@ -29,6 +29,7 @@ import java.util.List;
  * @desc :
  */
 public class BarcodeAnalyser implements ImageAnalysis.Analyzer {
+    private static final String TAG = BarcodeAnalyser.class.getSimpleName();
 
     private OnCameraAnalyserCallback onCameraAnalyserCallback;
     private final BarcodeScanner barcodeScanner;
@@ -106,7 +107,7 @@ public class BarcodeAnalyser implements ImageAnalysis.Analyzer {
                         isAnalyze = false;
                         for (Barcode barcode : barcodes) {
                             String value = barcode.getRawValue();
-                            Log.e("======", "value:" + value);
+                            Log.d(TAG, "value:" + value);
                         }
                         if (onCameraAnalyserCallback != null) {
                             onCameraAnalyserCallback.onSuccess(finalBitmap, barcodes);
@@ -122,7 +123,7 @@ public class BarcodeAnalyser implements ImageAnalysis.Analyzer {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.e("======", "onFailure---:" + e.toString());
+                        Log.w(TAG, "onFailure---:" + e.toString());
                     }
                 });
     }

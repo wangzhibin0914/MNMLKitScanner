@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScanPreviewActivity extends AppCompatActivity {
+    private static final String TAG = ScanPreviewActivity.class.getSimpleName();
 
     //用来保存当前Activity
     private static WeakReference<ScanPreviewActivity> sActivityRef;
@@ -77,7 +78,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             StatusBarUtil.setTransparentForWindow(this);
             int statusBarHeight = StatusBarUtil.getStatusBarHeight(mContext);
-            Log.e("======", "statusBarHeight--" + statusBarHeight);
+            Log.d(TAG, "statusBarHeight--" + statusBarHeight);
             ViewGroup.LayoutParams fakeStatusBarLayoutParams = fakeStatusBar.getLayoutParams();
             fakeStatusBarLayoutParams.height = statusBarHeight;
             fakeStatusBar.setLayoutParams(fakeStatusBarLayoutParams);
@@ -125,7 +126,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         });
     }
 
-    private void startCamera() {
+    protected void startCamera() {
         cameraManager.startCamera();
     }
 
@@ -136,7 +137,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         }
     }
 
-    private void initViews() {
+    protected void initViews() {
         rl_act_root = (RelativeLayout) findViewById(R.id.rl_act_root);
         mPreviewView = (PreviewView) findViewById(R.id.previewView);
         mPreviewView.setScaleType(PreviewView.ScaleType.FILL_CENTER);
@@ -173,10 +174,8 @@ public class ScanPreviewActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancle() {
-                cameraManager.setAnalyze(true);
-                result_point_view.removeAllPoints();
-                result_point_view.setVisibility(View.GONE);
+            public void onCancel() {
+                restartScan();
             }
         });
 
@@ -189,6 +188,12 @@ public class ScanPreviewActivity extends AppCompatActivity {
         }
         result_point_view.setScanConfig(mScanConfig);
         action_menu_view.setScanConfig(mScanConfig, MNScanConfig.mCustomViewBindCallback);
+    }
+
+    protected void restartScan() {
+        cameraManager.setAnalyze(true);
+        result_point_view.removeAllPoints();
+        result_point_view.setVisibility(View.GONE);
     }
 
     private void openLight() {
@@ -240,8 +245,9 @@ public class ScanPreviewActivity extends AppCompatActivity {
                     startCamera();
                 } else {
                     // Permission Denied 权限被拒绝
-                    Toast.makeText(mContext, "初始化相机失败,相机权限被拒绝", Toast.LENGTH_SHORT).show();
-                    finishFailed("初始化相机失败,相机权限被拒绝");
+                    String permissionDenied = "Camera permission denied.";
+                    Toast.makeText(mContext, permissionDenied, Toast.LENGTH_SHORT).show();
+                    finishFailed(permissionDenied);
                 }
                 break;
             case REQUEST_CODE_PERMISSION_STORAGE:
@@ -250,7 +256,8 @@ public class ScanPreviewActivity extends AppCompatActivity {
                     getImageFromAlbum();
                 } else {
                     //缺少权限
-                    Toast.makeText(mContext, "打开相册失败,读写权限被拒绝", Toast.LENGTH_SHORT).show();
+                    String permissionDenied = "Read storage permission denied.";
+                    Toast.makeText(mContext, permissionDenied, Toast.LENGTH_SHORT).show();
                 }
             default:
                 break;
@@ -269,7 +276,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
             }
             Bitmap decodeAbleBitmap = ImageUtils.getBitmap(mContext, data.getData());
             if (decodeAbleBitmap == null) {
-                Log.e("======", "decodeAbleBitmap == null");
+                Log.w(TAG, "decodeAbleBitmap == null");
                 return;
             }
             cameraManager.setAnalyze(false);
@@ -285,7 +292,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Log.e("======", "barcodes.size():" + barcodes.size());
+//                                            Log.d(TAG, "barcodes.size():" + barcodes.size());
                                             if (barcodes.size() == 0) {
                                                 cameraManager.setAnalyze(true);
                                                 Toast.makeText(mContext, "未找到二维码或者条形码", Toast.LENGTH_SHORT).show();
@@ -294,7 +301,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
                                             ArrayList<String> results = new ArrayList<>();
                                             for (Barcode barcode : barcodes) {
                                                 String value = barcode.getRawValue();
-                                                Log.e("======", "value:" + value);
+//                                                Log.d(TAG, "value:" + value);
                                                 results.add(value);
                                             }
 
@@ -306,7 +313,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Log.e("======", "onFailure---:" + e.toString());
+                                    Log.e(TAG, "onFailure---:" + e.toString());
                                 }
                             });
                 }
@@ -318,9 +325,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (result_point_view.getVisibility() == View.VISIBLE) {
-            cameraManager.setAnalyze(true);
-            result_point_view.removeAllPoints();
-            result_point_view.setVisibility(View.GONE);
+            restartScan();
             return;
         }
         //取消扫码
@@ -345,20 +350,29 @@ public class ScanPreviewActivity extends AppCompatActivity {
         finishFinal();
     }
 
-    private void finishSuccess(String result) {
+    /**
+     * 直接返回单个结果  可重写
+     * @param result
+     */
+    protected void finishSuccess(String result) {
         ArrayList<String> results = new ArrayList<>();
         results.add(result);
         finishSuccess(results);
     }
 
-    private void finishSuccess(ArrayList<String> results) {
+    /**
+     * 返回多个结果，  可重写
+     * @param results
+     */
+    protected void finishSuccess(ArrayList<String> results) {
+        Log.i(TAG,"finishSuccess results.get(0) = "+results.get(0));
         Intent intent = new Intent();
         intent.putStringArrayListExtra(MNScanManager.INTENT_KEY_RESULT_SUCCESS, results);
         setResult(MNScanManager.RESULT_SUCCESS, intent);
         finishFinal();
     }
 
-    private void finishFinal() {
+    protected void finishFinal() {
         closeLight();
         MNScanConfig.mCustomViewBindCallback = null;
         sActivityRef = null;

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="multi_code_detected">"Multiple QR codes have been scanned. Please select one to open"</string>
+</resources>

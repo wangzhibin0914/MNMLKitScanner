@@ -9,8 +9,9 @@
 
     <ImageView
         android:id="@+id/iv_point_bg"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@mipmap/scan_result_point"
         tools:background="@drawable/mn_scan_result_point_default" />
 
     <ImageView
@@ -18,6 +19,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:layout_centerInParent="true"
+        android:visibility="gone"
         android:src="@drawable/mn_icon_scan_default_result_point_arrow" />
 
 </RelativeLayout>

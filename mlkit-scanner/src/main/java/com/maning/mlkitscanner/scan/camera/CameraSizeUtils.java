@@ -11,13 +11,14 @@ import android.util.Size;
  * @desc :
  */
 public class CameraSizeUtils {
+    private static final String TAG = CameraSizeUtils.class.getSimpleName();
 
     public static Size getSize(Context context) {
         Size mTargetSize;
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
-        Log.i("======", String.format("displayMetrics:%d x %d", width, height));
+        Log.d(TAG, String.format("displayMetrics:%d x %d", width, height));
         //因为为了保持流畅性和性能，限制在1080p，在此前提下尽可能的找到屏幕接近的分辨率
         if (width < height) {
             int size = Math.min(width, 1080);
@@ -36,7 +37,7 @@ public class CameraSizeUtils {
                 mTargetSize = new Size((int) (size / 9.0f * 16.0), size);
             }
         }
-        Log.i("======", "mTargetSize:" + mTargetSize.getWidth() + "," + mTargetSize.getHeight());
+        Log.d(TAG, "mTargetSize:" + mTargetSize.getWidth() + "," + mTargetSize.getHeight());
         return mTargetSize;
     }
 
