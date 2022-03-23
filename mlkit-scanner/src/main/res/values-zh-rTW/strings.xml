@@ -1,0 +1,5 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="multi_code_detected">掃描到多個二維碼，請選擇一個打開</string>
+    <string name="place_code_closer">請把手機貼近二維碼</string>
+</resources>

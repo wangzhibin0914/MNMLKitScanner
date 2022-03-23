@@ -1,6 +1,9 @@
 package com.maning.mlkitscanner.scan.model;
 
 
+import android.graphics.Rect;
+import android.view.Surface;
+
 import com.maning.mlkitscanner.R;
 import com.maning.mlkitscanner.scan.callback.MNCustomViewBindCallback;
 
@@ -73,6 +76,9 @@ public class MNScanConfig implements Serializable {
     private boolean statusBarDarkMode = false;
     //是否绘制扫描框
     private boolean drawScanBox = true;
+    private String multiResultTips;
+    private Rect validRectFrame;
+    private int rotation = Surface.ROTATION_0;
 
     private MNScanConfig() {
 
@@ -105,6 +111,9 @@ public class MNScanConfig implements Serializable {
         statusBarColor = builder.statusBarColor;
         statusBarDarkMode = builder.statusBarDarkMode;
         drawScanBox = builder.drawScanBox;
+        multiResultTips = builder.multiResultTips;
+        validRectFrame = builder.validRectFrame;
+        rotation = builder.rotation;
     }
 
     public String getStatusBarColor() {
@@ -207,6 +216,14 @@ public class MNScanConfig implements Serializable {
         return drawScanBox;
     }
 
+    public String getMultiResultTips() {
+        return multiResultTips;
+    }
+
+    public int getRotation() {
+        return rotation;
+    }
+
     public static class Builder {
         private boolean showPhotoAlbum = true;
         private boolean showBeep = true;
@@ -250,6 +267,11 @@ public class MNScanConfig implements Serializable {
         private boolean statusBarDarkMode = false;
         //是否绘制扫描框
         private boolean drawScanBox = true;
+        //多个结果码提示
+        private String multiResultTips;
+        //有效扫码框范围
+        private Rect validRectFrame;
+        private int rotation;
 
         public MNScanConfig build() {
             return new MNScanConfig(this);
@@ -375,6 +397,21 @@ public class MNScanConfig implements Serializable {
 
         public Builder setDrawScanBox(boolean drawScanBox) {
             this.drawScanBox = drawScanBox;
+            return this;
+        }
+
+        public Builder setMultiResultTips(String multiResultTips) {
+            this.multiResultTips = multiResultTips;
+            return this;
+        }
+
+        public Builder setValidRectFrame(Rect validRectFrame) {
+            this.validRectFrame = validRectFrame;
+            return this;
+        }
+
+        public Builder setRotation(int rotation) {
+            this.rotation = rotation;
             return this;
         }
     }

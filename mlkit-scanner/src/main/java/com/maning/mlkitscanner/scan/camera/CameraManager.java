@@ -2,8 +2,12 @@ package com.maning.mlkitscanner.scan.camera;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.Surface;
 import android.view.View;
 
 import androidx.camera.core.Camera;
@@ -21,6 +25,7 @@ import androidx.lifecycle.LifecycleOwner;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.barcode.Barcode;
 import com.maning.mlkitscanner.scan.analyser.BarcodeAnalyser;
+import com.maning.mlkitscanner.scan.callback.BarcodeAnalyserResultCallback;
 import com.maning.mlkitscanner.scan.callback.OnCameraAnalyserCallback;
 import com.maning.mlkitscanner.scan.model.MNScanConfig;
 import com.maning.mlkitscanner.scan.utils.BeepManager;
@@ -34,7 +39,7 @@ import java.util.concurrent.Executors;
  * @desc :
  */
 public class CameraManager {
-
+    private static final String TAG = CameraManager.class.getSimpleName();
     private static final int HOVER_TAP_TIMEOUT = 150;
     private static final int HOVER_TAP_SLOP = 20;
 
@@ -80,6 +85,14 @@ public class CameraManager {
         barcodeAnalyser.setAnalyze(analyze);
     }
 
+    public void setAnalyzeRect(Rect rect){
+        barcodeAnalyser.setValidRectFrame(rect);
+    }
+
+    public void setBarcodeAnalyserResultCallback(BarcodeAnalyserResultCallback callback) {
+        barcodeAnalyser.setBarcodeAnalyserResultCallback(callback);
+    }
+
     private void initDatas() {
         mLifecycleOwner = (LifecycleOwner) mContext;
         beepManager = new BeepManager(mContext);
@@ -88,6 +101,7 @@ public class CameraManager {
     }
 
     public void startCamera() {
+        barcodeAnalyser.setAnalyze(false);
         cameraProviderFuture = ProcessCameraProvider.getInstance(mContext);
         cameraProviderFuture.addListener(new Runnable() {
             @Override
@@ -104,6 +118,7 @@ public class CameraManager {
                     //配置图片扫描
                     ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                             .setTargetResolution(CameraSizeUtils.getSize(mContext))
+                            .setTargetRotation(scanConfig.getRotation())
                             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                             .build();
                     imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), barcodeAnalyser);
@@ -112,6 +127,7 @@ public class CameraManager {
                     }
                     //将相机绑定到当前控件的生命周期
                     mCamera = cameraProvider.bindToLifecycle(mLifecycleOwner, cameraSelector, imageAnalysis, preview);
+                    new Handler().postDelayed(() -> barcodeAnalyser.setAnalyze(true), 500);//延时解析,增加扫描稳定性
                 } catch (Exception e) {
                 }
             }
@@ -122,13 +138,10 @@ public class CameraManager {
         barcodeAnalyser = new BarcodeAnalyser();
         barcodeAnalyser.setPreviewView(mPreviewView);
         barcodeAnalyser.setAnalyze(true);
-        barcodeAnalyser.setOnCameraAnalyserCallback(new OnCameraAnalyserCallback() {
-            @Override
-            public void onSuccess(Bitmap bitmap, List<Barcode> barcodes) {
-                beepManager.playBeepSoundAndVibrate();
-                if (onCameraAnalyserCallback != null) {
-                    onCameraAnalyserCallback.onSuccess(bitmap, barcodes);
-                }
+        barcodeAnalyser.setOnCameraAnalyserCallback((bitmap, barcodes) -> {
+            beepManager.playBeepSoundAndVibrate();
+            if (onCameraAnalyserCallback != null) {
+                onCameraAnalyserCallback.onSuccess(bitmap, barcodes);
             }
         });
     }
@@ -151,6 +164,7 @@ public class CameraManager {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             float scale = detector.getScaleFactor();
+            Log.d(TAG,"onScale scale = "+scale);
             if (mCamera != null) {
                 float ratio = mCamera.getCameraInfo().getZoomState().getValue().getZoomRatio();
                 zoomTo(ratio * scale);

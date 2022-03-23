@@ -9,11 +9,13 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -42,12 +44,14 @@ public class ScanResultPointView extends FrameLayout {
     private int resultPointWithdHeight;
     private int resultPointRadiusCorners;
     private int resultPointStrokeWidth;
-    private TextView tv_cancel,tv_tips;
+    private TextView tv_tips;
     private FrameLayout fl_result_point_root;
     private View fakeStatusBar;
     private int statusBarHeight;
-    private ImageView iv_show_result;
+    private ImageView iv_show_result,iv_back;
     private Bitmap barcodeBitmap;
+    private RelativeLayout rl_tips;
+//    private LinearLayout ll_cancel;
 
     public void setOnResultPointClickListener(OnResultPointClickListener onResultPointClickListener) {
         this.onResultPointClickListener = onResultPointClickListener;
@@ -76,8 +80,9 @@ public class ScanResultPointView extends FrameLayout {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.mn_scan_result_point_view, this);
         fakeStatusBar = view.findViewById(R.id.fakeStatusBar2);
         iv_show_result = view.findViewById(R.id.iv_show_result);
-        tv_cancel = view.findViewById(R.id.tv_cancel);
+        iv_back = view.findViewById(R.id.iv_back);
         tv_tips = view.findViewById(R.id.tv_tips);
+        rl_tips = view.findViewById(R.id.rl_tips);
         fl_result_point_root = view.findViewById(R.id.fl_result_point_root);
 
         statusBarHeight = StatusBarUtil.getStatusBarHeight(getContext());
@@ -87,7 +92,7 @@ public class ScanResultPointView extends FrameLayout {
             fakeStatusBar.setLayoutParams(fakeStatusBarLayoutParams);
         }
 
-        tv_cancel.setOnClickListener(new OnClickListener() {
+        iv_back.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 //隐藏View
@@ -140,19 +145,19 @@ public class ScanResultPointView extends FrameLayout {
         }
     }
 
-    public void setDatas(List<Barcode> results, Bitmap barcode) {
+    public void setDatas(List<Barcode> results, Bitmap barcode,float tipsY) {
         this.resultPoint = results;
         this.barcodeBitmap = barcode;
-        drawableResultPoint();
+        drawableResultPoint(tipsY);
     }
 
     public void removeAllPoints() {
         fl_result_point_root.removeAllViews();
     }
 
-    private void drawableResultPoint() {
+    private void drawableResultPoint(float tipsYPoint) {
         Log.d(TAG, "drawableResultPoint---start");
-        iv_show_result.setImageBitmap(barcodeBitmap);
+//        iv_show_result.setImageBitmap(barcodeBitmap);
         removeAllPoints();
         if (resultPoint == null || resultPoint.size() == 0) {
             if (onResultPointClickListener != null) {
@@ -163,12 +168,11 @@ public class ScanResultPointView extends FrameLayout {
         if (scanConfig == null) {
             scanConfig = new MNScanConfig.Builder().build();
         }
-        if (resultPoint.size() == 1) {
-            tv_cancel.setVisibility(View.INVISIBLE);
-            tv_tips.setVisibility(View.INVISIBLE);
+
+        if (resultPoint.size() == 1){
+            rl_tips.setVisibility(GONE);
         } else {
-            tv_cancel.setVisibility(View.VISIBLE);
-            tv_tips.setVisibility(View.VISIBLE);
+            rl_tips.setVisibility(VISIBLE);
         }
 
         float textY = 0f;
@@ -229,13 +233,17 @@ public class ScanResultPointView extends FrameLayout {
             fl_result_point_root.addView(inflate);
         }
 
+        RelativeLayout.LayoutParams lpRoot = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        rl_tips.setLayoutParams(lpRoot);
+        rl_tips.setX(0);
+        rl_tips.setY(tipsYPoint + statusBarHeight);
 //        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-//        Log.d(TAG,"tv_tips.getMeasuredWidth() = "+tv_tips.getMeasuredWidth());
-//        tv_tips.setX((displayMetrics.widthPixels - tv_tips.getMeasuredWidth()) / 2);
-//        tv_tips.setY(Math.min(textY + 300, displayMetrics.heightPixels));
+//        if (tipsYPoint == 0f) {
+//            tipsYPoint = Math.min(textY + 300, displayMetrics.heightPixels - 200);
+//        }
 
         int childCount = fl_result_point_root.getChildCount();
-        Log.d(TAG, "fl_result_point_root---childCount：" + childCount);
+//        Log.d(TAG, "fl_result_point_root---childCount：" + childCount);
         if (childCount <= 0) {
             //关闭页面
             if (onResultPointClickListener != null) {
@@ -243,6 +251,12 @@ public class ScanResultPointView extends FrameLayout {
             }
         }
 //        Log.d(TAG, "drawableResultPoint---end");
+    }
+
+    public void setMultiScanTips(String tips) {
+        if (tv_tips != null) {
+            tv_tips.setText(tips);
+        }
     }
 
 }

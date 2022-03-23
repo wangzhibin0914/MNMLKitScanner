@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -25,6 +28,7 @@ import com.google.mlkit.vision.barcode.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 import com.maning.mlkitscanner.R;
 import com.maning.mlkitscanner.scan.MNScanManager;
+import com.maning.mlkitscanner.scan.callback.BarcodeAnalyserResultCallback;
 import com.maning.mlkitscanner.scan.callback.OnCameraAnalyserCallback;
 import com.maning.mlkitscanner.scan.camera.CameraManager;
 import com.maning.mlkitscanner.scan.model.MNScanConfig;
@@ -58,6 +62,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
     private ScanResultPointView result_point_view;
     private ScanActionMenuView action_menu_view;
     private RelativeLayout rl_act_root;
+    private ImageView iv_show_result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,18 +121,91 @@ public class ScanPreviewActivity extends AppCompatActivity {
         cameraManager.setOnCameraAnalyserCallback(new OnCameraAnalyserCallback() {
             @Override
             public void onSuccess(Bitmap bitmap, List<Barcode> barcodes) {
+                result_point_view.setDatas(barcodes, bitmap, getTipsY());
+                result_point_view.setVisibility(View.VISIBLE);
+                iv_show_result.setImageBitmap(bitmap);
+                iv_show_result.setVisibility(View.VISIBLE);
+                stopCameraOnMultiScan();
+                resetZoomConfig();
                 if (barcodes.size() == 1) {
                     finishSuccess(barcodes.get(0).getRawValue());
-                } else {
-                    result_point_view.setDatas(barcodes, bitmap);
-                    result_point_view.setVisibility(View.VISIBLE);
                 }
+            }
+        });
+
+        cameraManager.setBarcodeAnalyserResultCallback(new BarcodeAnalyserResultCallback() {
+            @Override
+            public void barcodeTooSmall() {
+                cameraManager.zoomTo(zoomOut());
+            }
+
+            @Override
+            public void barcodeOutOfBound(Barcode barcode) {
+
             }
         });
     }
 
+    /**
+     * 自动缩放扫码   *************************************************
+     */
+    private static final float originalZoomRatio = 1.0f;
+    private static final float originalZoomStep = 1.1f;
+    private float currentZoomRatio = originalZoomRatio;
+    private float currentZoomStep = originalZoomStep;
+    private boolean haveShown = false;
+    private int count = 0;
+
+    private float zoomOut() {
+        if (currentZoomRatio >= 2f) {
+//            if (!haveShown && ++count >= 5) {
+//                runOnUiThread(() -> {
+//                    haveShown = true;
+//                    Toast.makeText(mContext, getString(R.string.place_code_closer), Toast.LENGTH_LONG).show();
+//                });
+//            }
+            return currentZoomRatio;
+        }
+        if (currentZoomStep > 1.3f) {
+            currentZoomStep -= 0.01f;
+        } else {
+            currentZoomStep += 0.01f;
+        }
+        currentZoomRatio *= currentZoomStep;
+        return currentZoomRatio;
+    }
+
+    private void resetZoomConfig() {
+        currentZoomRatio = originalZoomRatio;//还原放大比例
+        currentZoomStep = originalZoomStep;
+        haveShown = false;
+        count = 0;
+    }
+    // *************************************************
+
+    /**
+     * 子类重写
+     */
+    protected float getTipsY() {
+        return 0f;
+    }
+
     protected void startCamera() {
         cameraManager.startCamera();
+    }
+
+    protected void setScanRect(Rect rect){
+        int offsetY = StatusBarUtil.getStatusBarHeight(this);//状态栏修正
+        Rect rect1 = new Rect(rect);//不影响原数据
+        rect1.top += offsetY;
+        rect1.bottom += offsetY;
+        cameraManager.setAnalyzeRect(rect1);
+    }
+
+    boolean stopped = false;
+    protected void stopCameraOnMultiScan(){
+        cameraManager.stopCamera();
+        stopped = true;
     }
 
     private void initConfig() {
@@ -145,6 +223,7 @@ public class ScanPreviewActivity extends AppCompatActivity {
         viewfinderView = (ViewfinderView) findViewById(R.id.viewfinderView);
         action_menu_view = (ScanActionMenuView) findViewById(R.id.action_menu_view);
         result_point_view = (ScanResultPointView) findViewById(R.id.result_point_view);
+        iv_show_result = (ImageView) findViewById(R.id.iv_show_result);
 
         action_menu_view.setOnScanActionMenuListener(new ScanActionMenuView.OnScanActionMenuListener() {
             @Override
@@ -188,12 +267,17 @@ public class ScanPreviewActivity extends AppCompatActivity {
         }
         result_point_view.setScanConfig(mScanConfig);
         action_menu_view.setScanConfig(mScanConfig, MNScanConfig.mCustomViewBindCallback);
+        result_point_view.setMultiScanTips(mScanConfig.getMultiResultTips());
     }
 
     protected void restartScan() {
-        cameraManager.setAnalyze(true);
+        if (stopped) {
+            startCamera();
+        }
         result_point_view.removeAllPoints();
         result_point_view.setVisibility(View.GONE);
+        iv_show_result.setImageBitmap(null);
+        iv_show_result.setVisibility(View.GONE);
     }
 
     private void openLight() {
